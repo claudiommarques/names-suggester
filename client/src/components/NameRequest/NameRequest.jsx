@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import styles from "./NameRequest.module.css"
 import { camelCaseWord } from '../../utils/formatter/data';
-import { Card } from '../Card/Card';
+import { Card } from '../Card';
 import babyImg from './assets/img/baby.jpeg';
 
 //Here are some constants refering to this file/feature.
@@ -69,24 +69,24 @@ export const NameRequest  = ({data}) => {
     const nameOfClickedGender = getNamesByGender(gender);
 
     const suggestNameRecursive = (gender, nameToReqPos) => {
-      alreadySuggested.current[gender].push(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name]);
-      setSuggestedName(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name]);
+      if ( nameToReqPos+1 > nameOfClickedGender.length) {
+        nameToReqPos = 0;
+        alreadySuggested.current[gender] = [];
+      }
+
+      if (alreadySuggested.current[gender].indexOf(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name].toUpperCase()) >= 0){
+        alreadySuggested.current[gender].push(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name].toUpperCase());
+        nameToReqPos = nameToReqPos+1;
+        suggestNameRecursive(gender, nameToReqPos)
+      } else {
+        alreadySuggested.current[gender].push(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name].toUpperCase());
+        setSuggestedName(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name]);
+      }
     }
 
     setLastClickedGender(gender);
-
-    if (nameToReqPos < nameOfClickedGender.length && alreadySuggested.current[gender].indexOf(nameOfClickedGender[nameToReqPos][ATTRS_POSITION.name]) < 0){
-      suggestNameRecursive(gender, nameToReqPos)
-    } else {
-      if ( nameToReqPos+1 > nameOfClickedGender.length ) {
-        nameToReqPos = 0;
-        alreadySuggested.current[gender] = [];
-        suggestNameRecursive(gender, nameToReqPos)
-      } else {
-        suggestNameRecursive(gender, nameToReqPos+1)
-      }
-    }
-  };
+    suggestNameRecursive(gender, nameToReqPos)
+    };
 
   return (
     <div className={styles.container}>
