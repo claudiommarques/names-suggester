@@ -1,0 +1,1 @@
+export { BabyGenerator } from './BabyGenerator';
